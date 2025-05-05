@@ -22,7 +22,7 @@ parser.add_argument('--log-interval', type=int, default=10, metavar='N',
 args = parser.parse_args()
 
 
-env = gym.make('CartPole-v1', render_mode="human")
+env = gym.make("CartPole-v1", render_mode="human")
 env.reset(seed=args.seed)
 torch.manual_seed(args.seed)
 
@@ -107,3 +107,5 @@ def main():
 if __name__ == '__main__':
     main()
 
+#to show window with live render run (will run slower than without render): 
+#python reinforce.py  --render
