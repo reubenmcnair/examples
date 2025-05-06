@@ -11,8 +11,10 @@ from torch.distributions import Categorical
 
 
 parser = argparse.ArgumentParser(description='PyTorch REINFORCE example')
-parser.add_argument('--gamma', type=float, default=0.99, metavar='G',
-                    help='discount factor (default: 0.99)')
+# parser.add_argument('--gamma', type=float, default=0.99, metavar='G',
+#                     help='discount factor (default: 0.99)')
+parser.add_argument('--gamma', type=float, default=0, metavar='G',
+                    help='discount factor (default: 0)')
 parser.add_argument('--seed', type=int, default=543, metavar='N',
                     help='random seed (default: 543)')
 parser.add_argument('--render', action='store_true',
@@ -23,34 +25,47 @@ args = parser.parse_args()
 
 
 env = gym.make("CartPole-v1", render_mode="human")
-env.reset(seed=args.seed)
-torch.manual_seed(args.seed)
+env.reset(seed=args.seed) #set seed of the env
+torch.manual_seed(args.seed) #set seed of the torch
 
 
-class Policy(nn.Module):
+class Policy(nn.Module): 
     def __init__(self):
-        super(Policy, self).__init__()
-        self.affine1 = nn.Linear(4, 128)
-        self.dropout = nn.Dropout(p=0.6)
-        self.affine2 = nn.Linear(128, 2)
+        """Policy network
 
-        self.saved_log_probs = []
-        self.rewards = []
+        DNN model consisting of 2 linear layers with ReLU activation
+        
+        """
+        super(Policy, self).__init__()
+        self.affine1 = nn.Linear(4, 128) #linear layer taking (4,) input and outputting (128,) output
+        self.dropout = nn.Dropout(p=0.6) #dropout 60% of the neurons
+        self.affine2 = nn.Linear(128, 2) #linear layer taking (128,) input and outputting (2,) output such that 0 = L, 1 = R
+
+        self.saved_log_probs = [] #list to save log probabilities of actions
+        self.rewards = [] #list to save rewards
 
     def forward(self, x):
         x = self.affine1(x)
         x = self.dropout(x)
         x = F.relu(x)
         action_scores = self.affine2(x)
-        return F.softmax(action_scores, dim=1)
+        return F.softmax(action_scores, dim=1) #return softmax of action scores with output shape (2,)
 
 
-policy = Policy()
-optimizer = optim.Adam(policy.parameters(), lr=1e-2)
-eps = np.finfo(np.float32).eps.item()
+policy = Policy() #initialize policy model
+optimizer = optim.Adam(policy.parameters(), lr=1e-2) #initialize optimizer
+eps = np.finfo(np.float32).eps.item() #small value to avoid division by zero
 
 
 def select_action(state):
+    """Select action based on policy
+
+    Args:
+        state (torch): state of the environment
+
+    Returns:
+        int: action to take
+    """
     state = torch.from_numpy(state).float().unsqueeze(0)
     probs = policy(state)
     m = Categorical(probs)
@@ -60,6 +75,7 @@ def select_action(state):
 
 
 def finish_episode():
+    """Finish episode"""
     R = 0
     policy_loss = []
     returns = deque()
@@ -110,3 +126,5 @@ if __name__ == '__main__':
 
 #to show window with live render run (will run slower than without render): 
 #python reinforce.py  --render
+
+#comment to initiate gene's branch
