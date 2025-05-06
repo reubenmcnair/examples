@@ -96,10 +96,10 @@ def finish_episode():
 
 def main():
     running_reward = 10
-    for i_episode in count(1):
+    for i_episode in count(1): #can change this to e.g. range(1, 100) to limit to 100 episodes (attempts) while learning. 
         state, _ = env.reset()
         ep_reward = 0
-        for t in range(1, 10000):  # Don't infinite loop while learning
+        for t in range(1, 10000):  # Don't infinite loop while learning, this is how long it can run each 'episode' (attempt) before it ends. 
             action = select_action(state)
             state, reward, done, _, _ = env.step(action)
             if args.render:
@@ -114,7 +114,8 @@ def main():
         if i_episode % args.log_interval == 0:
             print('Episode {}\tLast reward: {:.2f}\tAverage reward: {:.2f}'.format(
                   i_episode, ep_reward, running_reward))
-        if running_reward > env.spec.reward_threshold:
+        #if running_reward > env.spec.reward_threshold: #typically 475 for cartpole-v1, smoothed reward
+        if ep_reward > 50: #option in which a manual reward threshold is set for any given episode
             print("Solved! Running reward is now {} and "
                   "the last episode runs to {} time steps!".format(running_reward, t))
             break
