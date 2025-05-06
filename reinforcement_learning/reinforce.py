@@ -8,6 +8,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 from torch.distributions import Categorical
+# import matplotlib.pyplot as plt
 
 
 parser = argparse.ArgumentParser(description='PyTorch REINFORCE example')
@@ -22,7 +23,7 @@ parser.add_argument('--log-interval', type=int, default=10, metavar='N',
 args = parser.parse_args()
 
 
-env = gym.make('CartPole-v1')
+env = gym.make("CartPole-v1", render_mode="human")
 env.reset(seed=args.seed)
 torch.manual_seed(args.seed)
 
@@ -106,3 +107,6 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+#to show window with live render run (will run slower than without render): 
+#python reinforce.py  --render
