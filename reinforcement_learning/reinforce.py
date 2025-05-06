@@ -8,6 +8,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 from torch.distributions import Categorical
+# import matplotlib.pyplot as plt
 
 
 parser = argparse.ArgumentParser(description='PyTorch REINFORCE example')
