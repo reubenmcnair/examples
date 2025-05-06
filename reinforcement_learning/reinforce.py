@@ -62,23 +62,24 @@ def select_action(state):
     """Select action based on policy
 
     Args:
-        state (torch): state of the environment
+        state (np.array): state of the environment
 
     Returns:
         int: action to take
     """
-    state = torch.from_numpy(state).float().unsqueeze(0)
-    probs = policy(state)
-    m = Categorical(probs)
-    action = m.sample()
-    policy.saved_log_probs.append(m.log_prob(action))
+    state = torch.from_numpy(state).float().unsqueeze(0) #convert state from np.array to torch.tensor with shape (1, 4)
+    probs = policy(state) #get probabilities of actions
+    m = Categorical(probs) #create categorical distribution
+    action = m.sample() #sample action
+    policy.saved_log_probs.append(m.log_prob(action)) #save log probability of action
     return action.item()
 
 
 def finish_episode():
-    """Finish episode"""
+    """Finish episode    
+    """
     R = 0
-    policy_loss = []
+    policy_loss = [] #list to save policy loss
     returns = deque()
     for r in policy.rewards[::-1]:
         R = r + args.gamma * R
@@ -89,8 +90,8 @@ def finish_episode():
         policy_loss.append(-log_prob * R)
     optimizer.zero_grad()
     policy_loss = torch.cat(policy_loss).sum()
-    policy_loss.backward()
-    optimizer.step()
+    policy_loss.backward() #backpropagate
+    optimizer.step() #update weights
     del policy.rewards[:]
     del policy.saved_log_probs[:]
 
